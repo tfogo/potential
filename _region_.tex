@@ -1,4 +1,4 @@
-\documentclass[]{article}
+\message{ !name(report.tex)}\documentclass[]{article}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -23,7 +23,6 @@
 \definecolor{mycolor3}{RGB}{217,206,178}
 \long\def\/*#1*/{}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
-\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -49,6 +48,9 @@
 \onehalfspacing
 
 \begin{document}
+
+\message{ !name(report.tex) !offset(-3) }
+
 \begin{titlepage}
 \begin{center}
 
@@ -186,32 +188,6 @@ where $a_i = l - x_i$ and $b_i = l + x_i$. This function was implemented in MATL
 
 \subsection{Fourier transforms}
 
-The Fourier transform is defined as:
-\begin{equation}
-\hat{f}(k) = \int_{-\infty}^{\infty} f(x)e^{2\pi ikx}\text{d}x
-\end{equation}
-And its inverse as:
-\begin{equation}
-f(x) = \int_{-\infty}^{\infty} \hat{f}(k)e^{2\pi ikx}\text{d}k
-\end{equation}
-See Fig.~\ref{} for the Fourier transforms of several functions. We note that the inverse Fourier transform of a real exponential decay is a Lorentzian:
-\begin{align*}
-\hat{f}^{-1}(e^{-\pi\sigma|k|}) = & \int_{-\infty}^{\infty} e^{-\pi\sigma|k|}e^{2\pi ikx}\text{d}k\\
-= & \int_{-\infty}^{\infty} e^{2\pi ikx-\pi\sigma|k|}\text{d}k\\
-= & \int_{-\infty}^{\infty} e^{(2\pi ix+\pi\sigma)x}\text{d}k + \int_{-\infty}^{\infty} e^{(2\pi ix-\pi\sigma)x}\text{d}k\\
-= & \frac{1}{2\pi ix + \pi\sigma} - \frac{1}{2\pi ix - \pi\sigma}\\
-= & \frac{1}{\pi}\frac{\frac{1}{2}\sigma}{x^2 + \left(\frac{1}{2}\sigma\right)^2} \numberthis \label{lorentzian}
-\end{align}
-Where (\ref{lorentzian}) is a Lorentzian with a full width at half maximum (FWHM) of $\sigma$.
-
-Fig.~\ref{} was created using a fast Fourier transform (FFT) algorithm. This algorithm trades exactness for speed. For example, Fig.~\ref{} shows the FFT of the superposition of Lorentzians seen in Fig.~\ref{}. the FFT introduces an artifact visible in the tail of the transform. This artifact can be reduced by increasing the length over which we take the FFT. Fig.~\ref{fftrange} shows FFTs of the same superposition of Lorentzians taken over different lengths. Increasing the length, increases the length of `good' transform and diminishes the artifact.
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{Fouriers_with_varying_range.eps}
-\caption{FFTs of the same superposition of Lorentzians. The FFTs were taken over different lengths. Note the artifacts on the tails of the FFTs decrease in size for FFTs taken over longer lengths. \label{fftrange}}
-\end{figure}
-
 \section{Method}
 
 \subsection{The 1D investigation}
@@ -296,21 +272,11 @@ void potential(double a, double d, double *x, double *y, double *charge, double 
 Refactoring this code into C resulted in a $\sim 20\%$ speed-up on the author's hardware. As the C code is compiled, its speed is dependent upon the compiler and the processor for which it is compiled. This C code was compiled using GCC 4.4.
 
 \section{Results}
-Three 1D random charge distributions were generated. For each charge distribution, the potential landscapes at six distances were calculated. Fig.~\ref{} shows the potential landscapes at different $d$ for the same charge distribution. The landscapes are transposed along the vertical axis for clarity. It can be seen that the landscape is jagged close to the line of charges and smooths out further away. This is in agreement with Makarovsky et al \ref{2010}.
-
-For each potential landscape modelled, the FFT of the landscape was taken. Fig.~\ref{} shows the FFT of a landscape. This FFT is recognisable as an exponential decay. Plotting the FFT on a log scale confirms this (see Fig.~\ref{}). Makarovsky et al \ref{2010} found that the potential minima due to Mn$_i^{2+}$ clusters were approximately parabolic close to minima. This Fourier transform shows that quantum dots due to random clustering of ions are Lorentzian in shape (see Eq.~\ref{}).
-
-There is a slightly non-linear section at the start of the FFT and a highly anomolous region at the tail. Comparing this with Fig.~\ref{} it can be seen that these are artifacts caused by the FFT algorithm and have nothing to do with the landscape. To mitigate the tail artifact, the FFT was taken over a large length. Then the artifacts at the head and tail were cut off, leaving the linear section for analysis (see Fig.~\ref{}).
-
-A line was fitted to the fourier transform data. The line was of the form $y = -\pi\sigma x + c$, where $\sigma$ is the FWHM of the Lorentzians in the potential landscape. The average ratio between $\sigma$ and $d$ was calculated and found to be 2.43. Therefore the relationship between the distance $d$ from the line of charges and the FWHM $\sigma$ of the quantum dots is
-\begin{equation}
-\sigma = 2.43d
-\end{equation}
 
 \begin{center}
   \begin{tabular}{| l | r | r | r | r |}
     \hline
-    $d$ (nm) & $\pi \sigma$ (nm)  & $\sigma$ (nm) & $\bar{\sigma}$ (nm) & $\frac{\bar{\sigma}}{d}$ \\ \hline
+    $d$ (nm) & $\pi w$ (nm)  & $w$ (nm) & $\bar{w}$ (nm) & $\frac{\bar{w}}{d}$ \\ \hline
     \multirow{3}{*}{1} & -7.90 &  2.52 & \multirow{3}{*}{2.61} & \multirow{3}{*}{2.61} \\ 
     & -8.41 &  2.68 & & \\ 
     & -8.29 &  2.64 & & \\ \hline
@@ -338,6 +304,13 @@ A line was fitted to the fourier transform data. The line was of the form $y = -
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{potentials.eps}
+\caption{Movement of branching points in a living \emph{P. Imperitor} (a-c) at 0,1 and 2 months respectively.
+Computer simulation with e being the starting and e and f being after 30,000 and 50,000 iterations \label{branching}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{Fouriers_with_varying_range.eps}
 \caption{Movement of branching points in a living \emph{P. Imperitor} (a-c) at 0,1 and 2 months respectively.
 Computer simulation with e being the starting and e and f being after 30,000 and 50,000 iterations \label{branching}}
 \end{figure}
@@ -436,3 +409,5 @@ Computer simulation with e being the starting and e and f being after 30,000 and
 \bibliography{mybib} 
 
 \end{document}
+
+\message{ !name(report.tex) !offset(-413) }
